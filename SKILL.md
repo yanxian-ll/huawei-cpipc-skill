@@ -29,6 +29,7 @@ Read only what the task needs:
 - **What each section and each sentence should do** -> `references/writing-blueprint.md`
 - **Abstract vs Intro vs problem analysis vs model vs result vs conclusion boundaries** -> `references/section-boundaries.md`
 - **Figures, tables, equations, numerical claims, validation, sensitivity** -> `references/evidence-writing.md`
+- **Format discipline + model workload / complexity ladder** -> `references/format-and-workload.md`
 - **“Write like a strong/award-winning modeling paper”** -> `references/award-paper-patterns.md`
 - **Final manuscript audit** -> `references/review-checklist.md`
 - **Automated heuristic linting** -> `tools/paper_lint.py` and `tools/README.md`
@@ -64,6 +65,46 @@ Before writing a full paper or a large section, silently map each subquestion:
 | Q1 | ... | ... | ... | ... | ... | ... |
 
 Any blank cell in `Required output`, `Evidence`, or `Final answer` is a likely `MAJOR` issue.
+
+### 2.5. Pass the two competition-readiness gates
+
+Read `references/format-and-workload.md` for architecture, full-paper drafting, and final audit.
+
+#### Gate A — Format discipline
+
+Before optimizing prose or adding advanced models, verify the manuscript can be evaluated smoothly:
+
+- anonymity and file hygiene follow the official rules;
+- the abstract independently exposes task, method/model, key results, conclusion, and innovation/characteristics;
+- figure/table/equation numbering is consistent;
+- symbols and units are consistent across the whole paper;
+- body text, figures/tables, and code/attachments agree on model names, parameters, sample sizes, units, results, and final schemes;
+- conclusions do not exceed what the model and evidence actually support.
+
+Do not silently convert a teaching convention into an official requirement. For exact formatting, the current official template and notice remain authoritative.
+
+#### Gate B — Model workload / justified complexity
+
+Make the team's actual work visible through a problem-driven ladder:
+
+`baseline runnable -> mechanism integration -> optimization enhancement -> uncertainty treatment -> validation/feedback`
+
+Interpret the layers as:
+
+1. **Baseline runnable**: the model runs, is reproducible, and directly answers a task.
+2. **Mechanism integration**: industry/physical/engineering/business structure is embedded in equations, constraints, states, geometry, or system logic rather than using generic data fitting alone.
+3. **Optimization enhancement**: advanced optimization/search is added only to solve a real non-convex, combinatorial, discrete, large-scale, multi-objective, or otherwise difficult computation.
+4. **Uncertainty treatment**: randomness, measurement error, parameter uncertainty, or scenario variability is modeled when it can change conclusions.
+5. **Validation/feedback**: sensitivity, error analysis, baseline comparison, cross-validation, boundary tests, ablation, feasibility checks, or robustness tests close the modeling loop.
+
+Not every problem needs all five layers. Complexity must be justified by a concrete problem difficulty and show incremental value. Do **not** stack GA/PSO/SA/ACO/deep learning/Monte Carlo merely to make the paper look busy.
+
+For every added layer, silently fill:
+
+| Layer | Problem difficulty | Added mechanism/method | New evidence | Incremental value vs previous layer | Keep? |
+|---|---|---|---|---|---|
+
+If `Problem difficulty` or `Incremental value` is empty, simplify the model instead of adding complexity.
 
 ### 3. Build a section map before prose
 
@@ -215,9 +256,11 @@ Return:
 1. question-to-evidence matrix;
 2. proposed section tree;
 3. for each subsection, the intended sentence roles and evidence to insert;
-4. missing information marked `【待补】`.
+4. missing information marked `【待补】`;
+5. a **Format Gate** checklist covering anonymity, abstract completeness, numbering/symbols/units, and body-figure-code consistency;
+6. a **Workload Ladder** table showing, for each subquestion, which of `baseline -> mechanism -> optimization -> uncertainty -> validation` is actually needed and why.
 
-Do not write pages of prose before the architecture is coherent.
+Do not write pages of prose before the architecture is coherent. Do not recommend extra model layers unless they solve a named difficulty and create measurable incremental value.
 
 ### Draft mode
 
@@ -259,10 +302,15 @@ Treat linter output as **review targets**, not automatic truth. Resolve findings
 
 For text-source manuscripts, run Lint mode first when practical, then perform semantic/manual audit. Merge both sets of findings instead of returning the linter output alone.
 
+Every full Audit must answer two additional high-level questions:
+
+- **Format risk**: could formatting, anonymity, numbering, symbol/unit inconsistency, body-figure-code mismatch, or unsupported conclusion language cause the work to be undervalued?
+- **Workload visibility**: can a judge clearly see what real modeling work was done at the baseline, mechanism, optimization, uncertainty, and validation levels, and does each retained layer add justified value?
+
 Return issues grouped by severity:
 
 - `BLOCKER`: official-rule violation, identity leakage, fabricated/unsupported content, broken provenance, AI-compliance risk, MD5/submission risk.
-- `MAJOR`: missing answer to a subquestion, method/result inconsistency, unexplained formula, unsupported conclusion, missing validation for a critical claim, duplicated/incorrect section roles.
+- `MAJOR`: missing answer to a subquestion, method/result inconsistency, unexplained formula, unsupported conclusion, missing validation for a critical claim, duplicated/incorrect section roles, invisible or unjustified model layers.
 - `MINOR`: wording, paragraph order, notation consistency, caption/style clarity.
 
 For each issue, identify the section, quote/paraphrase the problematic text briefly, explain the issue, and propose a concrete revision. Linter findings should keep their rule code and line number when useful.
@@ -299,6 +347,10 @@ Before declaring a section complete, verify:
 - method, result, interpretation, and validation have not been conflated;
 - no section is doing another section's main job;
 - abstract, body, and conclusion agree on model names, metrics, units, and numbers;
+- body text, figures/tables, and code/attachments do not contradict one another;
 - claimed innovations are visible and supported in the body;
+- each advanced model layer solves a named problem difficulty and has evidence of incremental value;
+- unnecessary algorithm/model stacking has been removed;
+- the final model chain is reproducible and closes with validation appropriate to the problem;
 - no official-format, citation, anonymity, or AI-use rule has been violated;
 - if a text manuscript was available, automated lint findings have been reviewed rather than ignored.
