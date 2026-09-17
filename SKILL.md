@@ -31,6 +31,7 @@ Read only what the task needs:
 - **Figures, tables, equations, numerical claims, validation, sensitivity** -> `references/evidence-writing.md`
 - **“Write like a strong/award-winning modeling paper”** -> `references/award-paper-patterns.md`
 - **Final manuscript audit** -> `references/review-checklist.md`
+- **Automated heuristic linting** -> `tools/paper_lint.py` and `tools/README.md`
 - **Sentence-level section examples** -> `examples/section-templates.md`
 - **Full-paper drafting or restructuring** -> `examples/full-paper-skeleton.md`
 
@@ -242,7 +243,21 @@ Pay special attention to abstract / Introduction / problem analysis / results / 
 
 Read `examples/full-paper-skeleton.md`. Draft in question-oriented modules. Do not force empty sections. Keep placeholders when evidence is missing.
 
+### Lint mode
+
+When a UTF-8 `.tex`, `.md`, or `.txt` manuscript is available, run:
+
+```bash
+python tools/paper_lint.py <paper> --fail-on none
+```
+
+Use `--fragment` when checking only one section. Use `--json` when another tool or Agent will consume the findings.
+
+Treat linter output as **review targets**, not automatic truth. Resolve findings against the manuscript, the team's evidence, `references/review-checklist.md`, and the official rules. Do not blindly delete legitimate institution names in citations or weaken a mathematically justified claim merely to silence a heuristic warning.
+
 ### Audit mode
+
+For text-source manuscripts, run Lint mode first when practical, then perform semantic/manual audit. Merge both sets of findings instead of returning the linter output alone.
 
 Return issues grouped by severity:
 
@@ -250,7 +265,7 @@ Return issues grouped by severity:
 - `MAJOR`: missing answer to a subquestion, method/result inconsistency, unexplained formula, unsupported conclusion, missing validation for a critical claim, duplicated/incorrect section roles.
 - `MINOR`: wording, paragraph order, notation consistency, caption/style clarity.
 
-For each issue, identify the section, quote/paraphrase the problematic text briefly, explain the issue, and propose a concrete revision.
+For each issue, identify the section, quote/paraphrase the problematic text briefly, explain the issue, and propose a concrete revision. Linter findings should keep their rule code and line number when useful.
 
 ## Default paper architecture
 
@@ -285,4 +300,5 @@ Before declaring a section complete, verify:
 - no section is doing another section's main job;
 - abstract, body, and conclusion agree on model names, metrics, units, and numbers;
 - claimed innovations are visible and supported in the body;
-- no official-format, citation, anonymity, or AI-use rule has been violated.
+- no official-format, citation, anonymity, or AI-use rule has been violated;
+- if a text manuscript was available, automated lint findings have been reviewed rather than ignored.
