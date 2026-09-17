@@ -27,9 +27,15 @@ huawei-cpipc-skill/
 │   ├── evidence-writing.md
 │   ├── award-paper-patterns.md
 │   └── review-checklist.md
-└── examples/
-    ├── section-templates.md
-    └── full-paper-skeleton.md
+├── examples/
+│   ├── section-templates.md
+│   └── full-paper-skeleton.md
+├── tools/
+│   ├── paper_lint.py
+│   └── README.md
+├── tests/
+│   └── test_paper_lint.py
+└── .github/workflows/tests.yml
 ```
 
 ### 每个文件负责什么
@@ -43,6 +49,9 @@ huawei-cpipc-skill/
 - `references/review-checklist.md`：BLOCKER / MAJOR / MINOR 级终稿审查。
 - `examples/section-templates.md`：单章节句子职责模板。
 - `examples/full-paper-skeleton.md`：从摘要到附件的完整论文骨架。
+- `tools/paper_lint.py`：零第三方依赖的启发式论文静态审稿器。
+- `tools/README.md`：paper-lint 规则、命令行参数和使用边界。
+- `tests/test_paper_lint.py`：linter 单元测试。
 
 ## 句子职责体系
 
@@ -67,9 +76,7 @@ Skill 在写段落前会先在内部判断每句话的主职责：
 T + D + M + R + I + C
 ```
 
-即一句话同时说任务、为什么这么做、用了什么、结果多少、说明什么、还自称创新。
-
-Skill 会把它拆成多个职责明确的句子。
+即一句话同时说任务、为什么这么做、用了什么、结果多少、说明什么、还自称创新。Skill 会把它拆成多个职责明确的句子。
 
 ## 摘要 / Intro / 问题分析 / 结论怎么区分
 
@@ -181,6 +188,43 @@ Skill 会要求补：模型来源或推导、变量含义、现实对应、参�
 
 不会因为某篇一等奖论文用了神经网络，就建议所有题都用神经网络。
 
+## 自动 paper-lint
+
+对 UTF-8 的 `.tex`、`.md` 或纯文本草稿可以直接运行：
+
+```bash
+python tools/paper_lint.py paper.tex
+```
+
+只检查单节：
+
+```bash
+python tools/paper_lint.py result-section.md --fragment
+```
+
+输出 JSON 给 Agent 继续处理：
+
+```bash
+python tools/paper_lint.py paper.tex --json --fail-on none
+```
+
+当前自动检查包括：
+
+- `TODO / XXX / 待补 / ??` 等终稿占位符；
+- 邮箱、队号、人员/单位字段等匿名风险；
+- 摘要是否明显缺方法、结果、创新点、关键词；
+- “由图可知”但没有量化证据；
+- “显著 / 鲁棒 / 最优 / 普适”等强结论没有附近证据；
+- 摘要与结论机械重复；
+- 摘要/结论中的关键数值在正文无法追溯；
+- `[n]` 引用与参考文献条目断裂；
+- LaTeX `\cite / \bibitem / \label / \ref` 基本一致性；
+- 图表疑似只有题注、没有正文引用；
+- “首先/其次/然后/最后”流程化表达过多；
+- 某一问长篇展开但缺少明确最终回答。
+
+它是**启发式风险扫描器**，不是自动评委。合法引用外部高校时匿名规则可能误报；真正有统计检验支持的“显著”不能因为 lint 就删掉。正确流程是：`自动发现 -> 人工核验 -> 按证据修订`。
+
 ## 使用模式
 
 ### 1. Architecture mode：先搭整篇论文
@@ -191,8 +235,6 @@ Skill 会要求补：模型来源或推导、变量含义、现实对应、参�
 先建立“每一问 -> 方法 -> 结果 -> 证据 -> 验证”的矩阵，再设计论文目录。
 对每个小节列出应该出现的句子职责，不要先生成长篇正文。
 ```
-
-适合比赛前半段和论文结构重构。
 
 ### 2. Draft mode：写某一节
 
@@ -230,12 +272,12 @@ Skill 会要求补：模型来源或推导、变量含义、现实对应、参�
 不要重新讲算法常识；提炼每个结果的关键发现、真实数值、比较基准、解释和最终答题句。
 ```
 
-### 6. Audit mode：最终审稿
+### 6. Lint + Audit mode：最终审稿
 
 ```text
 使用 huawei-cpipc-paper skill 的 Audit mode。
-按 2026 华为杯官方要求审查全文。
-先报 BLOCKER，再报 MAJOR、MINOR。
+如果有 tex/md/txt 源稿，先运行 tools/paper_lint.py，再按 2026 华为杯官方要求做语义审稿。
+合并自动检查与人工检查，先报 BLOCKER，再报 MAJOR、MINOR。
 重点检查匿名、AI 使用、模型/公式来源、每问证据链、图表解释，以及摘要-正文-结论数字一致性。
 ```
 
